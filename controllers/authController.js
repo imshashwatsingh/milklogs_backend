@@ -59,8 +59,8 @@ export const verifyOTP = async (req, res) => {
 
     // Insert user
     const insertQuery =
-      "INSERT INTO users (username, email, is_verified) VALUES ($1, $2, $3) RETURNING *";
-    const insertValues = [username, email, true];
+      "INSERT INTO users (username, email) VALUES ($1, $2) RETURNING *";
+    const insertValues = [username, email];
     const newUser = await db.query(insertQuery, insertValues);
 
     // Delete OTP
@@ -84,7 +84,7 @@ export const login = async (req, res) => {
 
   try {
     // Check if user exists and is verified
-    const query = "SELECT * FROM users WHERE email = $1 AND is_verified = true";
+    const query = "SELECT * FROM users WHERE email = $1 ";
     const result = await db.query(query, [email]);
     if (result.rows.length === 0) {
       return res.status(400).json({ error: "User not found or not verified" });
@@ -128,7 +128,7 @@ export const loginVerifyOTP = async (req, res) => {
 
     // Get user
     const userQuery =
-      "SELECT * FROM users WHERE email = $1 AND is_verified = true";
+      "SELECT * FROM users WHERE email = $1";
     const userResult = await db.query(userQuery, [email]);
     if (userResult.rows.length === 0) {
       return res.status(400).json({ error: "User not found" });
@@ -143,5 +143,17 @@ export const loginVerifyOTP = async (req, res) => {
   } catch (error) {
     console.error("Error verifying login OTP:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const authenticate  = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ message: "No token provided" });
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res.status(403).json({ message: "Invalid token" });
   }
 };
