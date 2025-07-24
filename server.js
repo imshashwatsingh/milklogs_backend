@@ -12,7 +12,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/", homeRoutes);
+// base for auth routes
 app.use("/auth", authRoutes);
+// base for dashboard routes
 app.use("/dashboard", dashboardRoutes);
 
 const PORT = process.env.PORT || 3000;
