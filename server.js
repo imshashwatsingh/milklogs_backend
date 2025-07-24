@@ -4,9 +4,15 @@ import authRoutes from "./routes/authRoutes.js";
 import homeRoutes from "./routes/index.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 
+import cors from "cors";
+
 env.config();
 
 const app = express();
+
+// needed as backend and frontend are not on same url
+app.use(cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

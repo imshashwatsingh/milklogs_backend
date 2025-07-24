@@ -82,11 +82,11 @@ export const login = async (req, res) => {
   }
 
   try {
-    // Check if user exists and is verified
-    const query = "SELECT * FROM users WHERE email = $1 ";
+    // Check if user exists
+    const query = "SELECT * FROM users WHERE email = $1";
     const result = await db.query(query, [email]);
     if (result.rows.length === 0) {
-      return res.status(400).json({ error: "User not found or not verified" });
+      return res.status(400).json({ error: "User not found" });
     }
 
     // Generate OTP and store it
@@ -126,8 +126,7 @@ export const loginVerifyOTP = async (req, res) => {
     }
 
     // Get user
-    const userQuery =
-      "SELECT * FROM users WHERE email = $1";
+    const userQuery = "SELECT * FROM users WHERE email = $1";
     const userResult = await db.query(userQuery, [email]);
     if (userResult.rows.length === 0) {
       return res.status(400).json({ error: "User not found" });
@@ -145,14 +144,14 @@ export const loginVerifyOTP = async (req, res) => {
   }
 };
 
-export const authenticate  = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
+export const authenticate = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "No token provided" });
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (err) {
-    res.status(403).json({ message: "Invalid token" });
+    res.status(403).json({ message: "Invalid or expired token" });
   }
 };
