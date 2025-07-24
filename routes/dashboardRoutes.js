@@ -1,15 +1,17 @@
 import express from "express";
-import { register, verifyOTP, login, loginVerifyOTP, authenticate } from "../controllers/authController.js";
-import { getuser } from "../controllers/userController.js";
+import { authenticate } from "../controllers/authController";
+import { updateProfile, addData, updateData, getEntry, getAllEntry } from "../controllers/dashController.js";
 const router = express.Router();
 
-router.patch("/profileupdate", authenticate,);
+router.patch("/profileupdate", authenticate,updateProfile);
 /*
     req.body - default milk quantity, default milk price
 */
-router.put("/add", authenticate,);
-router.patch("/update", authenticate,);
+router.put("/add", authenticate,addData); // done 
+router.patch("/update", authenticate,updateData); // done
 
-router.get("/getentry:date", authenticate,); // for a specific date
-router.get("/getallentry:year", authenticate,); // for all entries 
+router.get("/getentry:date", authenticate,getEntry); // for a specific date
+
+
+router.get("/getallentry:year", authenticate,getAllEntry); // for all entries 
 
