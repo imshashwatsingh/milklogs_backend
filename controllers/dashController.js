@@ -21,7 +21,8 @@ export const updateProfile = async (req, res) => {
 };
 
 export const addData = async (req, res) => {
-  const { userId, milkQuantity, date } = req.body;
+  const { milkQuantity, date } = req.body;
+  const userId = req.user.user_id;
 
   if (!userId || !milkQuantity || !date) {
     return res

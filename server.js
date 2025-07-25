@@ -4,11 +4,14 @@ import authRoutes from "./routes/authRoutes.js";
 import homeRoutes from "./routes/index.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 
+import cors from  'cors';
+
 env.config();
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors);
 
 // Routes
 app.use("/", homeRoutes);
