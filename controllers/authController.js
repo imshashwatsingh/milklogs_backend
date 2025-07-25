@@ -2,6 +2,7 @@ import db from "../config/database.config.js";
 import { sendOTPEmail } from "../services/emailService.js";
 import { generateOTP } from "../services/otpService.js";
 import { generateToken } from "../utils/jwtUtils.js";
+import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
   const { username, email } = req.body;
@@ -65,8 +66,9 @@ export const verifyOTP = async (req, res) => {
 
     // Delete OTP
     await db.query("DELETE FROM otps WHERE email = $1", [email]);
+
     // Generate JWT
-    const token = await generateToken({ id: newUser.rows[0] });
+    const token = await generateToken(newUser.rows[0]);
     res.status(201).json({ token, user: newUser.rows[0] });
   } catch (error) {
     console.error("Error verifying OTP:", error);
@@ -82,11 +84,11 @@ export const login = async (req, res) => {
   }
 
   try {
-    // Check if user exists and is verified
-    const query = "SELECT * FROM users WHERE email = $1 ";
+    // Check if user exists
+    const query = "SELECT * FROM users WHERE email = $1";
     const result = await db.query(query, [email]);
     if (result.rows.length === 0) {
-      return res.status(400).json({ error: "User not found or not verified" });
+      return res.status(400).json({ error: "User not found" });
     }
 
     // Generate OTP and store it
@@ -126,8 +128,7 @@ export const loginVerifyOTP = async (req, res) => {
     }
 
     // Get user
-    const userQuery =
-      "SELECT * FROM users WHERE email = $1";
+    const userQuery = "SELECT * FROM users WHERE email = $1";
     const userResult = await db.query(userQuery, [email]);
     if (userResult.rows.length === 0) {
       return res.status(400).json({ error: "User not found" });
@@ -137,7 +138,7 @@ export const loginVerifyOTP = async (req, res) => {
     await db.query("DELETE FROM otps WHERE email = $1", [email]);
 
     // Generate JWT
-    const token = await generateToken({ id: userResult.rows[0] });
+    const token = await generateToken(userResult.rows[0]);
     res.status(200).json({ token, user: userResult.rows[0] });
   } catch (error) {
     console.error("Error verifying login OTP:", error);
@@ -145,11 +146,11 @@ export const loginVerifyOTP = async (req, res) => {
   }
 };
 
-export const authenticate  = (req, res, next) => {
+export const authenticate = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ message: "No token provided" });
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (err) {
