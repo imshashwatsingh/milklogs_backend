@@ -66,7 +66,7 @@ export const verifyOTP = async (req, res) => {
     // Delete OTP
     await db.query("DELETE FROM otps WHERE email = $1", [email]);
     // Generate JWT
-    const token = await generateToken({ id: newUser.rows[0].user_id });
+    const token = await generateToken({ id: newUser.rows[0] });
     res.status(201).json({ token, user: newUser.rows[0] });
   } catch (error) {
     console.error("Error verifying OTP:", error);
