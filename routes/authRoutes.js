@@ -7,6 +7,7 @@ router.post("/register", register);
 router.post("/verify-otp", verifyOTP);
 router.post("/login", login);
 router.post("/login-verify-otp", loginVerifyOTP);
-router.post("/getuser",authenticate,getuser);
+// fixed post to get
+router.get("/getuser", authenticate, getuser);
 
 export default router;

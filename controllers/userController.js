@@ -1,7 +1,8 @@
 import db from "../config/database.config.js";
 
 export const getuser = async (req, res) => {
-  const userId = req.user.id; // Assuming user ID is stored in req.user after authentication
+  // fixed id to user_id
+  const userId = req.user.user_id; // Assuming user ID is stored in req.user after authentication
 
   try {
     const query = "SELECT * FROM users WHERE user_id = $1";
